@@ -12,3 +12,5 @@ structure:
         path: /block-1/lesson-4
       - title: Lesson 5
         path: /block-1/lesson-5
+      - title: Lesson 6
+        path: /block-1/lesson-6
