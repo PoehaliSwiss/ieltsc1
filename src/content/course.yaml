@@ -4,3 +4,5 @@ structure:
     items:
       - title: Lesson 1
         path: /block-1/lesson-1
+      - title: Lesson 2
+        path: /block-1/lesson-2
