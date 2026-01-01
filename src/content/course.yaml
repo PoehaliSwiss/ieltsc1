@@ -54,3 +54,5 @@ structure:
         path: /block-3/lesson-23
       - title: Lesson 24
         path: /block-3/lesson-24
+  - title: Block 4
+    items: []
