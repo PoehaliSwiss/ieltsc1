@@ -5,6 +5,7 @@ import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
 import { useBlanks, getTextFromChildren, type BlankData, type BlankStatus } from './hooks/useBlanks';
 import { useProgress } from '../../context/ProgressContext';
+import { useSettings } from '../../context/SettingsContext';
 import { useLocation } from 'react-router-dom';
 import { Check } from 'lucide-react';
 import { generateStableExerciseId } from '../../utils/exerciseId';
@@ -110,10 +111,13 @@ export const InlineBlanks: React.FC<InlineBlanksProps> = ({ children, mode = 'ty
         handleBlur,
         touched,
         blurred,
-        revealAnswer,
+        showHintFor,
+        toggleHint,
         renderContent,
         allCorrect
     } = useBlanks({ children, mode, options });
+
+    const { showHints } = useSettings();
 
     // Check completion when all correct
     useEffect(() => {
@@ -180,25 +184,27 @@ export const InlineBlanks: React.FC<InlineBlanksProps> = ({ children, mode = 'ty
                         style={{ width: `${Math.max(answer.length * 10 + 10, 40)}px` }}
                     />
                 )}
-                <button
-                    onClick={() => revealAnswer(index)}
-                    title={value === answer ? "Hide hint" : "Show hint"}
-                    className="ml-0.5 p-0.5 text-gray-400 hover:text-yellow-500 transition-colors focus:outline-none"
-                >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-1 1.5-2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5" />
-                        <path d="M9 18h6" />
-                        <path d="M10 22h4" />
-                    </svg>
-                </button>
-                {data.hint && (touched[index] && value === data.answer) && (
+                {showHints && data.hint && (
+                    <button
+                        onClick={() => toggleHint(index)}
+                        title={showHintFor[index] ? "Hide hint" : "Show hint"}
+                        className={`ml-0.5 p-0.5 transition-colors focus:outline-none ${showHintFor[index] ? 'text-yellow-500' : 'text-gray-400 hover:text-yellow-500'}`}
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-1 1.5-2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5" />
+                            <path d="M9 18h6" />
+                            <path d="M10 22h4" />
+                        </svg>
+                    </button>
+                )}
+                {data.hint && showHintFor[index] && (
                     <span className="ml-1 text-xs text-gray-500 italic animate-in fade-in whitespace-nowrap">
                         ({data.hint})
                     </span>
                 )}
             </span>
         );
-    }, [mode, inputs, handleInputChange, handleBlur, options, revealAnswer]);
+    }, [mode, inputs, handleInputChange, handleBlur, options, showHints, showHintFor, toggleHint]);
 
     // For tables: process raw text to replace [answer] with placeholders, then use ReactMarkdown
     const processedMarkdown = useMemo(() => {

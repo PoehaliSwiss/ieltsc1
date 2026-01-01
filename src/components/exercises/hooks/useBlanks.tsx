@@ -117,6 +117,7 @@ export const useBlanks = ({ children, options: _options = [] }: UseBlanksOptions
     const [blurred, setBlurred] = useState<boolean[]>(() => new Array(answers.length).fill(false));
     const [submitted, setSubmitted] = useState(false);
     const [showAnswers, setShowAnswers] = useState(false);
+    const [showHintFor, setShowHintFor] = useState<boolean[]>(() => new Array(answers.length).fill(false));
 
     const handleInputChange = useCallback((index: number, value: string) => {
         setInputs(prev => {
@@ -157,20 +158,17 @@ export const useBlanks = ({ children, options: _options = [] }: UseBlanksOptions
         setTouched(new Array(answers.length).fill(false));
     }, [answers.length]);
 
-    const revealAnswer = useCallback((index: number) => {
-        setInputs(prev => {
+    // Toggle hint visibility for a specific blank
+    const toggleHint = useCallback((index: number) => {
+        setShowHintFor(prev => {
             const next = [...prev];
-            // Toggle logic: if already correct, clear it? Or just show?
-            // User usually wants to see the answer.
-            next[index] = answers[index];
+            next[index] = !next[index];
             return next;
         });
-        setTouched(prev => {
-            const next = [...prev];
-            next[index] = true;
-            return next;
-        });
-    }, [answers]);
+    }, []);
+
+    // Legacy function name for compatibility - now toggles hint
+    const revealAnswer = toggleHint;
 
     const showAllAnswers = useCallback(() => {
         setInputs([...answers]);
@@ -249,11 +247,13 @@ export const useBlanks = ({ children, options: _options = [] }: UseBlanksOptions
         blurred,
         submitted,
         showAnswers,
+        showHintFor,
         handleInputChange,
         handleBlur,
         checkAnswers,
         reset,
         revealAnswer,
+        toggleHint,
         showAllAnswers,
         renderContent,
         allCorrect,

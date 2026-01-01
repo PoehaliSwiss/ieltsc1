@@ -162,7 +162,8 @@ export const FillBlanks: React.FC<FillBlanksProps> = ({ children, mode = 'input'
         submitted,
         checkAnswers: hookCheckAnswers,
         reset: hookReset,
-        revealAnswer,
+        showHintFor,
+        toggleHint,
         showAllAnswers,
         renderContent,
         allCorrect: inputsAllCorrect,
@@ -409,11 +410,11 @@ export const FillBlanks: React.FC<FillBlanksProps> = ({ children, mode = 'input'
                             <option key={i} value={opt}>{opt}</option>
                         ))}
                     </select>
-                    {showHints && (
+                    {showHints && data.hint && (
                         <button
-                            onClick={() => revealAnswer(index)}
-                            title={value === answer ? "Hide hint" : "Show hint"}
-                            className="ml-0.5 p-0.5 text-gray-400 hover:text-yellow-500 transition-colors focus:outline-none"
+                            onClick={() => toggleHint(index)}
+                            title={showHintFor[index] ? "Hide hint" : "Show hint"}
+                            className={`ml-0.5 p-0.5 transition-colors focus:outline-none ${showHintFor[index] ? 'text-yellow-500' : 'text-gray-400 hover:text-yellow-500'}`}
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                 <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-1 1.5-2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5" />
@@ -421,6 +422,11 @@ export const FillBlanks: React.FC<FillBlanksProps> = ({ children, mode = 'input'
                                 <path d="M10 22h4" />
                             </svg>
                         </button>
+                    )}
+                    {data.hint && showHintFor[index] && (
+                        <span className="ml-1 text-xs text-gray-500 italic animate-in fade-in whitespace-nowrap">
+                            ({data.hint})
+                        </span>
                     )}
                 </span>
             );
@@ -492,11 +498,11 @@ export const FillBlanks: React.FC<FillBlanksProps> = ({ children, mode = 'input'
                     )}
                     style={{ width: `${Math.max(answer.length * 10 + 20, 60)}px` }}
                 />
-                {showHints && (
+                {showHints && data.hint && (
                     <button
-                        onClick={() => revealAnswer(index)}
-                        title={value === answer ? "Hide hint" : "Show hint"}
-                        className="ml-0.5 p-0.5 text-gray-400 hover:text-yellow-500 transition-colors focus:outline-none"
+                        onClick={() => toggleHint(index)}
+                        title={showHintFor[index] ? "Hide hint" : "Show hint"}
+                        className={`ml-0.5 p-0.5 transition-colors focus:outline-none ${showHintFor[index] ? 'text-yellow-500' : 'text-gray-400 hover:text-yellow-500'}`}
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                             <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-1 1.5-2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5" />
@@ -505,14 +511,14 @@ export const FillBlanks: React.FC<FillBlanksProps> = ({ children, mode = 'input'
                         </svg>
                     </button>
                 )}
-                {data.hint && (touched[index] && value === data.answer) && (
+                {data.hint && showHintFor[index] && (
                     <span className="ml-1 text-xs text-gray-500 italic animate-in fade-in whitespace-nowrap">
                         ({data.hint})
                     </span>
                 )}
             </span>
         );
-    }, [mode, inputs, handleInputChange, handleBlur, options, submitted, showHints, revealAnswer, droppedItems, handleDropZoneClick, getItemText, activeDropMenu, dragItems, handleMenuOptionClick]);
+    }, [mode, inputs, handleInputChange, handleBlur, options, submitted, showHints, showHintFor, toggleHint, droppedItems, handleDropZoneClick, getItemText, activeDropMenu, dragItems, handleMenuOptionClick]);
 
     // For tables: process raw text to replace [answer] with placeholders, then use ReactMarkdown
     const processedMarkdown = useMemo(() => {
